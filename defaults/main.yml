@@ -23,8 +23,8 @@ dataverse:
     provider: EZID
   filesdir: /usr/local/dvn/data
   git:
-    branch:
-    repo: https://github.com/IQSS/dataverse.git
+    branch: '{{ branch }}'
+    repo: '{{ repo }}'
   glassfish:
     user: glassfish
     group: glassfish
