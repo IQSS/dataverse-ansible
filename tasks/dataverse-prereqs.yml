@@ -6,12 +6,11 @@
   when: ansible_os_family == "RedHat" and
         ansible_distribution_major_version == "7"
 
-# fine in vagrant, kills standalone.
-#- name: update ansible
-#  yum: name=ansible state=latest
-#  when: ansible_os_family == "RedHat" and
-#        ansible_distribution_major_version == "7"
-#  tags: prereqs
+# downgrade ansible until they fix makecache bug
+- name: enforce ansible-2.7.9 for now
+  yum:
+    name: https://releases.ansible.com/ansible/rpm/release/epel-7-x86_64/ansible-2.7.9-1.el7.ans.noarch.rpm
+    state: present
 
 - name: let's use the closest centos mirror
   file: path=/var/cache/yum/x86_64/7/timedhosts.txt state=absent
