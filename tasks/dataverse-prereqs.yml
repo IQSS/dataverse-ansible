@@ -2,7 +2,9 @@
 # dataverse/tasks/dataverse-prereqs.yml
 
 - name: ensure EPEL repository for RedHat7/CentOS7
-  yum: name=epel-release state=latest
+  yum:
+    name: epel-release
+    state: latest
   when: ansible_os_family == "RedHat" and
         ansible_distribution_major_version == "7"
 
@@ -14,7 +16,9 @@
     allow_downgrade: yes
 
 - name: let's use the closest centos mirror
-  file: path=/var/cache/yum/x86_64/7/timedhosts.txt state=absent
+  file:
+    path: /var/cache/yum/x86_64/7/timedhosts.txt
+    state: absent
   when: ansible_os_family == "RedHat" and
         ansible_distribution_major_version == "7"
 
@@ -33,7 +37,9 @@
   tags: prereqs
 
 - name: install ImageMagick for RedHat/CentOS to allow thumbnail generation
-  yum: name=ImageMagick state=latest
+  yum:
+    name: ImageMagick
+    state: latest
   when:
     - ansible_os_family == "RedHat"
     - ansible_distribution_major_version == "7"
