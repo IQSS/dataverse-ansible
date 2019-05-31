@@ -11,6 +11,7 @@
   yum:
     name: https://releases.ansible.com/ansible/rpm/release/epel-7-x86_64/ansible-2.7.9-1.el7.ans.noarch.rpm
     state: present
+    allow_downgrade: yes
 
 - name: let's use the closest centos mirror
   file: path=/var/cache/yum/x86_64/7/timedhosts.txt state=absent
