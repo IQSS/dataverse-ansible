@@ -10,7 +10,7 @@ The preparation lies in the group_var options (usernames/passwords, whether to i
 ### Usage:
 	$ git clone https://github.com/IQSS/dataverse-ansible.git dataverse
 	$ export ANSIBLE_ROLES_PATH=.
-	$ ansible-playbook -i <inventory file> [-u <user>] [-b] [-K] -e @<group_vars_file> [-v] dataverse.pb
+	$ ansible-playbook --connection=local -v -i dataverse/inventory dataverse/dataverse.pb -e dataverse/defaults/main.yml
 
 The role currently supports CentOS 7 with all services running on the same machine, but intends to become OS-agnostic and support multiple nodes for scalability.
 
