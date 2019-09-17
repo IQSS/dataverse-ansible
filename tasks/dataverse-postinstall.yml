@@ -10,7 +10,7 @@
 - name: configure garbage collector
   become: yes
   become_user: "{{ dataverse.glassfish.user }}"
-  shell: '{{ glassfish_dir}}/bin/asadmin create-jvm-options "-XX\\:+UseG1GC"'
+  shell: '{{ glassfish_dir}}/bin/asadmin create-jvm-options "-XX\:+UseG1GC"'
   
 
 - name: stop glassfish manually (systemd gums up the works)
