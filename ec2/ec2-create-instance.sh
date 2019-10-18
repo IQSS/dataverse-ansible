@@ -183,8 +183,10 @@ if [ ! -z "$LOCAL_LOG_PATH" ]; then
    # 2 logdir should exist
    mkdir -p $LOCAL_LOG_PATH
    # 3 grab logs for local processing in jenkins
-   rsync -av -e "ssh -i $PEM_FILE" --ignore-missing-args centos@$PUBLIC_DNS:/tmp/dataverse/target/site $LOCAL_LOG_PATH/
-   rsync -av -e "ssh -i $PEM_FILE" --ignore-missing-args centos@$PUBLIC_DNS:/tmp/dataverse/target/surefire-reports $LOCAL_LOG_PATH/
+   # unset -e since os x rsync doesn't include --ignore-missing-args
+   set +e
+   rsync -av -e "ssh -i $PEM_FILE" centos@$PUBLIC_DNS:/tmp/dataverse/target/site $LOCAL_LOG_PATH/
+   rsync -av -e "ssh -i $PEM_FILE" centos@$PUBLIC_DNS:/tmp/dataverse/target/surefire-reports $LOCAL_LOG_PATH/
    rsync -av -e "ssh -i $PEM_FILE" centos@$PUBLIC_DNS:/usr/local/glassfish4/glassfish/domains/domain1/logs/server* $LOCAL_LOG_PATH/
 fi
 
