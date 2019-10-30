@@ -18,9 +18,14 @@
   when: ansible_os_family == "RedHat" and
         ansible_distribution_major_version == "7"
 
-- name: ensure EPEL repository for RedHat7/CentOS7
+- name: ensure EPEL repository for RHEL/CentOS
   yum: name=epel-release state=latest
   when: ansible_os_family == "RedHat"
+
+- name: CentOS8 needs PowerTools
+  shell: "dnf config-manager --enable PowerTools"
+  when: ansible_distribution == "CentOS" and
+        ansible_distribution_major_version == "8"
 
 - name: install java-nnn-openjdk and other packages for RedHat/CentOS.
   yum:
