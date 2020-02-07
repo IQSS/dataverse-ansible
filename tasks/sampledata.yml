@@ -55,7 +55,7 @@
     regexp: 'API_TOKEN'
     line: "api_token = '{{ api_token }}'"
 
-- name: remove unecessary lines from dvconfig.py
+- name: remove unnecessary lines from dvconfig.py
   lineinfile:
     path: '{{ dataverse.sampledata.dir }}/dvconfig.py'
     regexp: '{{ item }}'
