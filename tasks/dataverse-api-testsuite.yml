@@ -62,6 +62,7 @@
     method: POST
     headers:
       X-Dataverse-key: '{{ api_token }}'
+  when: dv_root_published is not defined
 
 - name: run test suite
   shell: '{{ dataverse.srcdir }}/run-test-suite.sh http://localhost:8080'

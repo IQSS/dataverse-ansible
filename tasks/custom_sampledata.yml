@@ -13,6 +13,7 @@
 - name: publish root dataverse
   shell: 'curl -s --insecure -u {{ api_token }}: -X POST -H "In-Progress: false" --data-binary @- http://localhost:8080/dvn/api/data-deposit/v1.1/swordv2/edit/dataverse/root'
   ignore_errors: yes
+  when: dv_root_published is not defined
 
 - name: get dv-root.json
   get_url:

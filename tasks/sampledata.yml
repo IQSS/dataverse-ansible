@@ -20,10 +20,10 @@
     mode: '0755'
 
 - name: create venv
-  shell: 'python3 -m venv {{ dataverse.sampledata.venv }}'
+  shell: 'python3 -m venv {{ dataverse.sampledata.dir }}'
 
 - name: source venv
-  shell: 'source {{ dataverse.sampledata.venv }}/bin/activate'
+  shell: 'source {{ dataverse.sampledata.dir }}/bin/activate'
 
 - name: install dependencies
   shell: 'pip3 install -r requirements.txt'
@@ -40,22 +40,37 @@
   set_fact:
     siteUrl_stripped: '{{ siteUrl | regex_replace ("\\", "") }}'
 
-- name: set siteUrl in dvconfig.py
-  replace:
-    dest: '{{ dataverse.sampledata.dir }}/dvconfig.py'
-    regexp: "^base_url = 'https://demo.dataverse.org'$"
-    replace: "base_url = '{{ siteUrl_stripped }}'"
+- name: set baseurl in dvconfig.py
+  lineinfile:
+    path: '{{ dataverse.sampledata.dir }}/dvconfig.py'
+    regexp: 'BASE_URL'
+    line: "base_url = '{{ siteUrl_stripped }}'"
 
 # ansible forgets this fact why...?
 - include: dataverse-apitoken.yml
 
-- name: set api token in dvconfig.py
-  replace:
-    dest: '{{ dataverse.sampledata.dir }}/dvconfig.py'
-    regexp: "^api_token = ''$"
-    replace: "api_token = '{{ api_token }}'"
+- name: set API_TOKEN in dvconfig.py
+  lineinfile:
+    path: '{{ dataverse.sampledata.dir }}/dvconfig.py'
+    regexp: 'API_TOKEN'
+    line: "api_token = '{{ api_token }}'"
+
+- name: remove unecessary lines from dvconfig.py
+  lineinfile:
+    path: '{{ dataverse.sampledata.dir }}/dvconfig.py'
+    regexp: '{{ item }}'
+    state: absent
+  with_items:
+    - DATAVERSE_SERVICE_HOST
+    - DATAVERSE_SERVICE_PORT_HTTP
+    - DATAVERSE_SERVICE_PORT_PROTO
+    - DATAVERSE_SERVICE_SUBPATH
 
 - name: run sampledata
   shell: 'python3 create_sample_data.py'
   args:
     chdir: '{{ dataverse.sampledata.dir }}'
+
+- name: mark root_dv as published
+  set_fact:
+    dv_root_published: true
