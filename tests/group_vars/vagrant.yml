@@ -27,7 +27,7 @@ dataverse:
     blocked_endpoints: "admin,test"
     blocked_policy: "localhost-only"
     location: "http://localhost:8080/api"
-    test_suite: true
+    test_suite: false
   copyright: "Your Institution"
   counter:
     enabled: false
@@ -150,6 +150,14 @@ rserve:
   pass: rserve
   port: 6311
   workdir: /tmp/Rserv
+
+selenium:
+  enabled: false
+  repo: https://github.com/GlobalDataverseCommunityConsortium/dataverse-test-suite.git
+  branch: master
+  browser: chrome
+  platform: WIN10
+  testversion: latest
 
 shibboleth:
   enabled: false

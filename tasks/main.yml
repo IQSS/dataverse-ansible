@@ -66,6 +66,10 @@
   when: dataverse.api.test_suite == true
   tags: apitestsuite
 
+- include: selenium.yml
+  when: selenium.enabled == true
+  tags: selenium
+
 - include: munin.yml
   when: munin.install == true
   tags: munin

@@ -1,0 +1,28 @@
+---
+
+- name: install npm
+  yum:
+    name: npm
+    state: latest
+
+- name: clone dataverse-test-suite repo
+  git:
+    repo: '{{ selenium.repo }}'
+    version: '{{ selenium.branch }}'
+    dest: /tmp/dataverse-test-suite
+
+- name: only test ussn
+  lineinfile:
+    path: /tmp/dataverse-test-suite/demo-dataverse.side
+    regexp: '"urls":'
+    line: '   "urls": ["http://localhost:8080"],'
+
+- name: install selenium-side-runner
+  npm:
+    name: selenium-side-runner
+    global: yes
+
+- name: run selenium tests
+  shell:
+    cmd: 'selenium-side-runner -c "browserName={{ selenium.browser }} platform={{ selenium.platform }} version={{ selenium.testversion }}" *.side'
+    chdir: /tmp/dataverse-test-suite
