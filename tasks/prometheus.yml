@@ -79,7 +79,7 @@
 - name: place jmx_export config.yaml
   copy:
     src: jmx_exporter_config.yml
-    dest: /etc/jmx_exporter_config.yml
+    dest: /etc/jmx_exporter/config.yml
     owner: root
     group: root
     mode: 0644
