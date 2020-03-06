@@ -93,7 +93,7 @@
 - name: place jmx_exporter agent
   get_url:
     url: '{{ prometheus.jmx_exporter.agenturl }}'
-    dest: '{{ glassfishdir }}/glassfish/lib/jmx_prometheus_javaagent.jar'
+    dest: '{{ glassfish_dir }}/glassfish/lib/jmx_prometheus_javaagent.jar'
     owner: root
     group: root
     mode: 0644
