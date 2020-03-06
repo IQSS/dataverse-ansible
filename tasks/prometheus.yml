@@ -105,7 +105,7 @@
 
 - name: start and enable node_exporter
   systemd:
-    name: prometheus
+    name: node_exporter
     state: started
     enabled: yes
 

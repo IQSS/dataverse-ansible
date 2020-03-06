@@ -8,6 +8,7 @@
     - collectd
     - collectd-generic-jmx
     - collectd-java
+    - collectd-postgresql
     - collectd-write_prometheus
 
 - name: place collectd conf file
