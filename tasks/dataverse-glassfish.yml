@@ -77,12 +77,7 @@
     - { user: "{{ dataverse.glassfish.user }}", type: soft, descriptor: nofile, value: 65000 }
     - { user: "{{ dataverse.glassfish.user }}", type: hard, descriptor: nofile, value: 65000 }
 
-- name: install glassfish systemd conf file for RedHat / CentOS7
-  template: src=glassfish.service.j2 dest=/usr/lib/systemd/system/glassfish.service
-        owner=root group=root mode=0644
-  when: ansible_os_family == "RedHat"
-
-- name: agent must be on glassfish classpath
+- name: jacoco agent must be on glassfish classpath
   copy:
     src: '{{ dataverse.jacoco.home }}/lib/jacocoagent.jar'
     dest: '{{ dataverse.glassfish.root }}/{{ dataverse.glassfish.dir }}/glassfish/lib/jacocoagent.jar'
@@ -94,6 +89,24 @@
     line: '        <jvm-options>-Djavaagent:{{ dataverse.glassfish.root }}/{{ dataverse.glassfish.dir }}/glassfish/lib/jacocoagent.jar'
     insertafter: 'dataverse.timerServer'
   when: dataverse.jacoco.enabled == true
+
+- name: place jmx_exporter agent
+  get_url:
+    url: '{{ prometheus.jmx_exporter.agenturl }}'
+    dest: '{{ glassfishdir }}/glassfish/lib/jmx_prometheus_javaagent.jar'
+    owner: root
+    group: root
+    mode: 0644
+  when: prometheus.install == true
+
+- name: install glassfish systemd conf file for RedHat / CentOS7
+  template:
+    src: glassfish.service.j2
+    dest: /usr/lib/systemd/system/glassfish.service
+    owner: root
+    group: root
+    mode: 0644
+  when: ansible_os_family == "RedHat"
 
 - name: reload systemd on RedHat/CentOS7
   shell: systemctl daemon-reload

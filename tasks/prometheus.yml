@@ -19,16 +19,6 @@
   user:
     name: '{{ prometheus.user }}'
 
-# firewalld is outside the role scope
-#- name: punch prometheus firewall holes
-#  firewalld:
-#    port: '{{ item }}'
-#    permanent: yes
-#    state: enabled
-#  with_items:
-#  - 9090/tcp
-#  - 9100/tcp
-
 - name: unarchive won't create directory
   file:
     path: '{{ prometheus.root }}'
@@ -81,6 +71,25 @@
     group: root
     mode: 0644
 
+- name: ensure /etc/jmx_exporter exists
+  file:
+    path: /etc/jmx_exporter
+    state: directory
+
+- name: place jmx_export config.yaml
+  copy:
+    src: jmx_exporter_config.yml
+    dest: /etc/jmx_exporter_config.yml
+    owner: root
+    group: root
+    mode: 0644
+
+- name: payara should load jmx_exporter agent
+  lineinfile:
+    path: /usr/lib/systemd/system/glassfish.service
+    regexp: '^ExecStart(.*)'
+    line: 'ExecStart = /usr/bin/java -javaagent:{{ glassfish_dir }}/glassfish/lib/jmx_prometheus_javaagent.jar=8888:/etc/jmx_exporter/config.yml -jar {{ glassfish_dir }}/glassfish/lib/client/appserver-cli.jar start-domain'
+
 - name: reload systemd
   shell: systemctl daemon-reload
 
@@ -101,3 +110,8 @@
     enabled: yes
 
 - include: grafana.yml
+
+- name: restart glassfish to enable jmx_exporter agent
+  systemd:
+    name: glassfish
+    state: restarted
