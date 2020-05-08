@@ -18,6 +18,6 @@ CURRENT=`/usr/bin/sudo -u {{ dataverse.glassfish.user }} $ASADMIN list-applicati
 /usr/bin/sleep 3
 
 # restart
-/usr/bin/sudo -u {{ dataverse.glassfish.user }} $ASADMIN stop-domain
+/usr/bin/sudo -u {{ dataverse.glassfish.user }} $ASADMIN stop-domain {{ dataverse.glassfish.domain }}
 /usr/bin/sleep 3
-/usr/bin/sudo -u {{ dataverse.glassfish.user }} $ASADMIN start-domain
+/usr/bin/sudo -u {{ dataverse.glassfish.user }} $ASADMIN start-domain {{ dataverse.glassfish.domain }}

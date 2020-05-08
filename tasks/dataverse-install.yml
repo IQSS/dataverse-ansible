@@ -93,6 +93,35 @@
     path: /tmp/dvinstall
     owner: '{{ dataverse.glassfish.user }}'
 
+- name: correct hard-coded domain1 paths in installer
+  replace:
+    path: '{{ item }}'
+    regexp: 'domain1'
+    replace: '{{ dataverse.glassfish.domain }}'
+  with_items:
+    - '/tmp/dvinstall/as-setup.sh'
+    - '/tmp/dvinstall/installAppServer.py'
+    - '/tmp/dvinstall/install.py'
+
+- name: correct hard-coded path in jhove.conf
+  lineinfile:
+    path: '/tmp/dvinstall/jhove.conf'
+    regexp: '/usr/local/glassfish4/glassfish/domains/domain1/'
+    line: 'file://{{ glassfish_dir }}/glassfish/domains/{{ dataverse.glassfish.domain }}/config/jhoveConfig.xsd">'
+
+- name: as-setup hard-codes 512m, payara5 production template defaults to 2g
+  lineinfile:
+    path: '{{ glassfish_dir }}/glassfish/domains/{{ dataverse.glassfish.domain }}/config/domain.xml'
+    regexp: '{{ item }}'
+    state: absent
+  with_items:
+    - '-Xmx2g'
+    - '-Xms2g'
+  when: dataverse.glassfish.zipurl is match(".*payara-5.*")
+
+- name: clear removed jvm-options for the installer
+  include: tasks/restart_glassfish.yml
+
 - name: fire off installer
   script: '/usr/bin/python /tmp/dvinstall/install.py -f --config_file=default.config --noninteractive > /tmp/dvinstall/install.out 2>&1'
   become: yes
@@ -107,8 +136,43 @@
 #    mode: 0600
 #  ignore_errors: yes
 
+# options we want that the installer doesn't currently set
 - name: set logging format
   become: yes
   become_user: "{{ dataverse.glassfish.user }}"
   shell: "{{ glassfish_dir }}/bin/asadmin set-log-file-format {{ dataverse.glassfish.logformat }}"
 
+# todo: match this to leonid's computed heap from install.py
+#- name: allocate heap memory at startup
+#  become: yes
+#  become_user: '{{ dataverse.glassfish.user }}'
+#  shell: '{{ glassfish_dir }}/bin/asadmin create-jvm-options "-Xms{{ dataverse.memheap }}m"'
+#  when: dataverse.glassfish.zipurl is match(".*payara-5.*")
+
+- name: adjust MaxMetaSpace to match heap size
+  replace:
+    path: '{{ glassfish_dir }}/glassfish/domains/{{ dataverse.glassfish.domain }}/config/domain.xml'
+    regexp: 'MaxMetaspaceSize=512m'
+    replace: 'MaxMetaspaceSize={{ dataverse.memheap }}m'
+  when: dataverse.glassfish.zipurl is match(".*payara-5.*")
+
+# this is already present in production domain
+#- name: isolated class loading of third party libraries and modules
+#  become: yes
+#  become_user: '{{ dataverse.glassfish.user }}'
+#  shell: '{{ glassfish_dir }}/bin/asadmin create-jvm-options "-Dfish.payara.classloading.delegate=false"'
+#  when: dataverse.glassfish.zipurl is match(".*payara-5.*")
+
+# leonid's installer sets both of these
+#- name: installer uses G1GC, enable string deduplication
+#  become: yes
+#  become_user: '{{ dataverse.glassfish.user }}'
+#  shell: '{{ glassfish_dir }}/bin/asadmin create-jvm-options "-XX:+UseStringDeduplication"'
+#  when: dataverse.glassfish.zipurl is match(".*payara-5.*")
+
+# todo: this is in the performance guide but throws an error
+#- name: disable explicit garbage collection
+#  become: yes
+#  become_user: '{{ dataverse.glassfish.user }}'
+#  shell: '{{ glassfish_dir }}/bin/asadmin create-jvm-options "-XX:+DisableExplicitGC"'
+#  when: dataverse.glassfish.zipurl is match(".*payara-5.*")

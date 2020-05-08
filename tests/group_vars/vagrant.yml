@@ -77,7 +77,7 @@ dataverse:
   glassfish:
     user: payara
     group: payara
-    domain: domain1
+    domain: production
     logformat: ulf
     adminuser: admin
     adminpass: notPr0d
@@ -94,7 +94,8 @@ dataverse:
   java:
     version: 1.8.0
   maxfileuploadsizeinbytes:
-  memheap: 1024
+  # dataverse installer assumes this in MB
+  memheap: 2048
   previewers:
     enabled: true
   sampledata:

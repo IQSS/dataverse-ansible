@@ -5,9 +5,9 @@ After = syslog.target network.target
 [Service]
 Type = forking
 User={{ dataverse.glassfish.user }}
-ExecStart = /usr/bin/java -jar {{ glassfish_dir }}/glassfish/lib/client/appserver-cli.jar start-domain
-ExecStop = /usr/bin/java -jar {{ glassfish_dir }}/glassfish/lib/client/appserver-cli.jar stop-domain
-ExecReload = /usr/bin/java -jar {{ glassfish_dir }}/glassfish/lib/client/appserver-cli.jar restart-domain
+ExecStart = /usr/bin/java -jar {{ glassfish_dir }}/glassfish/lib/client/appserver-cli.jar start-domain {{ dataverse.glassfish.domain }}
+ExecStop = /usr/bin/java -jar {{ glassfish_dir }}/glassfish/lib/client/appserver-cli.jar stop-domain {{ dataverse.glassfish.domain }}
+ExecReload = /usr/bin/java -jar {{ glassfish_dir }}/glassfish/lib/client/appserver-cli.jar restart-domain {{ dataverse.glassfish.domain }}
 LimitNOFILE=65000
 TimeoutStartSec=180s
 
