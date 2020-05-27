@@ -44,7 +44,9 @@
         dataverse_repo != "release"
 
 - include: dataverse-download.yml
-  tags: glassfish
+  tags:
+    - glassfish
+    - release
 
 - include: dataverse-glassfish.yml
   tags: glassfish
@@ -62,13 +64,14 @@
 
 - include: localstack_create.yml
   when: localstack.enabled == true
-  tags: localstack 
+  tags: localstack
 
 - include: dataverse-install.yml
   tags: dataverse
 
 - include: dataverse-postinstall.yml
   tags: postinstall
+  when: need_dataverse_install
 
 - include: sampledata.yml
   when: dataverse.sampledata.enabled == true

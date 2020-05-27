@@ -6,24 +6,39 @@
   debug:
     msg: '##### POST-INSTALL GLASSFISH CONFIGURATION #####'
 
+# Glassfish is not running here.
+#- name: stop glassfish manually (systemd gums up the works)
+#  become: yes
+#  become_user: "{{ dataverse.glassfish.user }}"
+#  shell: '{{ glassfish_dir }}/bin/asadmin stop-domain {{ dataverse.glassfish.domain }}'
+
 - name: set siteurl
-  become: yes
-  become_user: "{{ dataverse.glassfish.user }}"
-  shell: '{{ glassfish_dir}}/bin/asadmin create-jvm-options "-Ddataverse.siteUrl={{ siteUrl_escaped }}"'
+  lineinfile:
+    path:   '{{ glassfish_dir }}/glassfish/domains/{{ dataverse.glassfish.domain }}/config/domain.xml'
+    regexp: 'dataverse.siteUrl'
+    line:   '        <jvm-options>-Ddataverse.siteUrl={{ siteUrl_escaped }}</jvm-options>'
+    insertafter: '<jvm-options>-server</jvm-options>'
+  notify: enable and restart glassfish
 
-- name: stop glassfish manually (systemd gums up the works)
-  become: yes
-  become_user: "{{ dataverse.glassfish.user }}"
-  shell: '{{ glassfish_dir }}/bin/asadmin stop-domain {{ dataverse.glassfish.domain }}'
-
-- name: start glassfish with systemd
-  service: name=glassfish state=started
+- name: flush hadlers to restart glassfish if necessary
+  meta: flush_handlers
 
 - name: wait for glassfish to become ready
   wait_for:
     port: 8009
     state: present
     timeout: "{{ dataverse.glassfish.timeout }}"
+
+## this will definitely fail if run for the second time, so we use lineinfile above
+#- name: set siteurl
+#  become: yes
+#  become_user: "{{ dataverse.glassfish.user }}"
+#  shell: '{{ glassfish_dir }}/bin/asadmin create-jvm-options "-Ddataverse.siteUrl={{ siteUrl_escaped }}"'
+
+- name: set logging format
+  become: yes
+  become_user: "{{ dataverse.glassfish.user }}"
+  shell: "{{ glassfish_dir }}/bin/asadmin set-log-file-format {{ dataverse.glassfish.logformat }}"
 
 # python installer does this now
 #- name: setup-all.sh kitchen sink configuration.
@@ -75,18 +90,21 @@
     url: http://guides.dataverse.org/en/latest/_downloads/createsequence.sql
     dest: /tmp/createsequence.sql
     mode: '0644'
+  register: createsequence_sql_download
 
 - name: "support sequential identifiers use db.user"
   lineinfile:
     path: /tmp/createsequence.sql
     regexp: '^ALTER TABLE datasetidentifier_seq OWNER TO "dvnapp"'
     line: 'ALTER TABLE datasetidentifier_seq OWNER TO "{{ db.postgres.user }}";'
+  register: createsequence_sql_user
 
 - name: support sequential identifiers
   shell: "psql -U {{ db.postgres.user }} -h {{ db.postgres.host }} -d {{ db.postgres.name }} -f /tmp/createsequence.sql"
   environment:
     PGPASSWORD: "{{ db.postgres.pass }}"
-  
+  when: createsequence_sql_download.changed or createsequence_sql_user.changed
+
 - name: suppress grizzly ajp warnings
   become: yes
   become_user: "{{ dataverse.glassfish.user }}"
