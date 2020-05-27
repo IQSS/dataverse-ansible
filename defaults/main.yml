@@ -131,6 +131,7 @@ dataverse:
     argument: '-DcompilerArgument=-Xlint:unchecked test -P all-unit-tests'
   usermgmtkey: burrito
   version: '4.20'
+  checksum: 'sha256:e99c37794bf20b8ed28c2ee649de92950c1a950be4917339b7ba56abf85817f0'
 
 db:
   postgres:
