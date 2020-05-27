@@ -12,7 +12,7 @@
 
 - include: dataverse-build.yml
   when: dataverse_branch != "release"
-  
+
 - name: fix perms on dataverse-war
   file: path=/tmp/dvinstall/dataverse.war mode=0644
 
@@ -93,12 +93,49 @@
     path: /tmp/dvinstall
     owner: '{{ dataverse.glassfish.user }}'
 
+- name: make backup copy of install.py, to know whether it changed and we need to patch it later
+  copy:
+    src: /tmp/dvinstall/install.py
+    dest: /tmp/dvinstall/install.py.prev
+    remote_src: true
+  register: install_py # this will be marked changed if there was no install.py.prev and thus no previous install, or the downloaded is different from the previous
+
+- name: copy install.py to install_ansible.py
+  copy:
+    src: /tmp/dvinstall/install.py
+    dest: /tmp/dvinstall/install_ansible.py
+    remote_src: true
+  when: install_py.changed
+
+- name: patch install_ansible.py so that it does not ask for password
+  lineinfile:
+    path: /tmp/dvinstall/install_ansible.py
+    regexp: '^gfAdminLoginStatus'
+    state: absent
+
+- name: patch install_ansible.py so that it allows for java 11 also
+  lineinfile:
+    path: /tmp/dvinstall/install_ansible.py
+    regexp: '^   if not re.search."1.8", java_version.:'
+    line: '   if not (re.search("1.8", java_version) or re.search("11.", java_version)):'
+
+- name: patch install_ansible.py so that it allows for java 11 also
+  lineinfile:
+    path: /tmp/dvinstall/install_ansible.py
+    regexp: "^      sys.exit.\"Dataverse requires Java 1.8. Please install it, or make sure it's in your PATH, and try again\"."
+    line: "      sys.exit(\"Dataverse requires Java 1.8 or 11. Please install it, or make sure it's in your PATH, and try again\")"
+
+- name: calculate detaverse install necessity
+  set_fact:
+    need_dataverse_install: install_py.changed or dataverse_build_war.changed
+
 - name: fire off installer
-  script: '/usr/bin/python /tmp/dvinstall/install.py -f --config_file=default.config --noninteractive > /tmp/dvinstall/install.out 2>&1'
+  shell:
+    cmd: /usr/bin/python /tmp/dvinstall/install_ansible.py -f --config_file=default.config --noninteractive > /tmp/dvinstall/install.out 2>&1
+    chdir: /tmp/dvinstall
   become: yes
   become_user: '{{ dataverse.glassfish.user }}'
-  args:
-    chdir: /tmp/dvinstall
+  when: need_dataverse_install
 
 # install.py doesn't currently log this output, nothing sensitive in install.out
 #- name: negate need for password aliases
@@ -106,9 +143,3 @@
 #    name: /tmp/as-setup.out
 #    mode: 0600
 #  ignore_errors: yes
-
-- name: set logging format
-  become: yes
-  become_user: "{{ dataverse.glassfish.user }}"
-  shell: "{{ glassfish_dir }}/bin/asadmin set-log-file-format {{ dataverse.glassfish.logformat }}"
-
