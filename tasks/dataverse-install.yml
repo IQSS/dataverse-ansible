@@ -113,6 +113,12 @@
     regexp: '^gfAdminLoginStatus'
     state: absent
 
+- name: patch install_ansible.py for available jdbc driver version
+  lineinfile:
+    path: /tmp/dvinstall/install_ansible.py
+    regexp: '^pgJdbcDriver '
+    line: 'pgJdbcDriver = "postgresql-42.2.9.jar"'
+
 - name: patch install_ansible.py so that it allows for java 11 also
   lineinfile:
     path: /tmp/dvinstall/install_ansible.py
