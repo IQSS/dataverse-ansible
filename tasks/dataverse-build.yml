@@ -63,14 +63,17 @@
   args:
     chdir: "{{ dataverse.srcdir }}"
   when: dataverse.unittests.enabled == false
-  register: dataverse_build_war
+  register: dataverse_build_war1
 
 - name: build warfile with specified tests. tail /tmp/dataverse/mvn.out for gory details.
   shell: "mvn {{ dataverse.unittests.argument }} {{ jacoco_arg }} -T 2C package > mvn.out"
   args:
     chdir: "{{ dataverse.srcdir }}"
   when: dataverse.unittests.enabled == true
-  register: dataverse_build_war
+  register: dataverse_build_war2
+
+- set_fact:
+    dataverse_build_war_changed: dataverse_build_war1.changed or dataverse_build_war2.changed
 
 - name: copy warfile over release
   copy:

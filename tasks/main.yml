@@ -16,7 +16,10 @@
   tags: rserve
 
 - include: dataverse-fqdn.yml
-  tags: prereqs
+  tags:
+   - prereqs
+   - apache
+   - dataverse
 
 - include: sshkeys.yml
   when: sshkeys.enabled == True
@@ -70,14 +73,25 @@
   tags: dataverse
   when: dataverse_branch != "release"
 
+<<<<<<< HEAD
+=======
+#dataverse_zip_download.changed= {{ dataverse_zip_download }}
+#- debug: msg="dataverse_build_war_changed is defined={{ dataverse_build_war_changed is defined }}   dataverse_build_war_changed={{ dataverse_build_war_changed }} "
+#  tags: dataverse
+
+>>>>>>> d1c1ca5... correct war build detection during dataverse install
 - include: dataverse-install.yml
   tags: dataverse
   when: (dataverse_zip_download is defined and dataverse_zip_download.changed) or
-        (dataverse_branch != "release" and dataverse_build_war.changed)
+        (dataverse_branch != "release" and dataverse_build_war_changed)
 
 - include: dataverse-postinstall.yml
   tags: postinstall
+<<<<<<< HEAD
   when: need_dataverse_install
+=======
+  when: dataverse_zip_download.changed or dataverse_build_war_changed
+>>>>>>> d1c1ca5... correct war build detection during dataverse install
 
 - include: sampledata.yml
   when: dataverse.sampledata.enabled == true

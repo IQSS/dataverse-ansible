@@ -130,7 +130,7 @@
 
 - name: calculate detaverse install necessity
   set_fact:
-    need_dataverse_install: install_py.changed or dataverse_build_war.changed
+    need_dataverse_install: install_py.changed or dataverse_build_war_changed
 
 - name: fire off installer
   shell:
