@@ -139,6 +139,7 @@
   become: yes
   become_user: '{{ dataverse.glassfish.user }}'
   when: need_dataverse_install
+  notify: enable and restart glassfish
 
 # install.py doesn't currently log this output, nothing sensitive in install.out
 #- name: negate need for password aliases
