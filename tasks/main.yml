@@ -66,8 +66,14 @@
   when: localstack.enabled == true
   tags: localstack
 
+- include: dataverse-build.yml
+  tags: dataverse
+  when: dataverse_branch != "release"
+
 - include: dataverse-install.yml
   tags: dataverse
+  when: (dataverse_zip_download is defined and dataverse_zip_download.changed) or
+        (dataverse_branch != "release" and dataverse_build_war.changed)
 
 - include: dataverse-postinstall.yml
   tags: postinstall
