@@ -132,6 +132,13 @@
   set_fact:
     need_dataverse_install: install_py.changed or dataverse_build_war_changed
 
+- name: patch installAppServer.py so that FILES_DIR points to the correct location
+  lineinfile:
+    path: /tmp/dvinstall/installAppServer.py
+    regexp: "^   os.environ..FILES_DIR.. = "
+    line: "   os.environ['FILES_DIR'] = \"{{ dataverse.filesdirs[0].path }}\""
+  when: dataverse.filesdirs[0] is defined
+
 - name: fire off installer
   shell:
     cmd: /usr/bin/python /tmp/dvinstall/install_ansible.py -f --config_file=default.config --noninteractive > /tmp/dvinstall/install.out 2>&1

@@ -11,6 +11,14 @@
 - include: dataverse-prereqs.yml
   tags: prereqs
 
+- include: dataverse-required-variables.yml
+  tags:
+   - glassfish
+   - dataverse
+   - storage
+   - postinstall
+   - s3
+
 - include: rserve.yml
   when: rserve.install == true
   tags: rserve
@@ -31,10 +39,6 @@
 
 - include: dataverse-apache.yml
   tags: apache
-
-- include: dataverse-shibboleth.yml
-  when: shibboleth.enabled == True
-  tags: shibboleth
 
 - include: postgres.yml
   tags: postgres
@@ -79,9 +83,17 @@
   when: (dataverse_zip_download is defined and dataverse_zip_download.changed) or
         (dataverse_branch != "release" and dataverse_build_war_changed)
 
+- include: dataverse-storage.yml
+  when: dataverse.filesdirs[0] is defined
+  tags: storage
+
 - include: dataverse-postinstall.yml
   tags: postinstall
   when: need_dataverse_install
+
+- include: dataverse-shibboleth.yml
+  when: shibboleth.enabled == True
+  tags: shibboleth
 
 - include: sampledata.yml
   when: dataverse.sampledata.enabled == true
