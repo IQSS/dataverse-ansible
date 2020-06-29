@@ -1,7 +1,10 @@
 # Dataverse Ansible role
 
-This [Ansible][ansible] role aims to install [Dataverse][dataverse] and its prerequisites.
-The role installs PostgreSQL, GlassFish and other prerequisites, then deploys Dataverse.
+## June 29, 2020: This repository is deprecated.
+
+The dataverse-ansible repo has been moved to the [Global Dataverse Community Consortium](https://github.com/GlobalDataverseCommunityConsortium/dataverse-ansible) organization.
+
+Existing files will remain here to avoid breaking dependencies, but may no longer be updated.
 
 ## Quickstart
 
@@ -125,6 +128,7 @@ This is a community effort, written primarily by [Don Sizemore][donsizemore]. Th
 [dataverse]: https://dataverse.org
 [dataverse-sample-data]: https://github.com/IQSS/dataverse-sample-data
 [dataverse-previewers]: https://qualitativedatarepository.github.io/dataverse-previewers/
+[gdcc]: https://github.com/GlobalDataverseCommunityConsortium/dataverse-ansible/
 [iqss]: http://www.iq.harvard.edu
 [vagrant]: https://www.vagrantup.com
 [virtualbox]: https://www.virtualbox.org
