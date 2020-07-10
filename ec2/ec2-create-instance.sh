@@ -19,8 +19,8 @@ usage() {
   echo "default repo is https://github.com/IQSS/dataverse"
   echo "default .pem location is ${HOME}"
   echo "example group_vars may be retrieved from https://raw.githubusercontent.com/IQSS/dataverse-ansible/master/defaults/main.yml"
-  echo "default AWS AMI ID is $AWS_AMI_DEFAULT"
-  echo "default AWS size is t2.xlarge to avoid OoM killer during integration tests (otherwise, t2.large should be fine)"
+  echo "the default AWS AMI ID is $AWS_AMI_DEFAULT, find the full list at https://wiki.centos.org/Cloud/AWS"
+  echo "the default AWS size is t2.xlarge to avoid OoM killer during integration tests (otherwise, t2.large should be fine)"
   echo "local log path will rsync Payara, Jacoco, Maven and other logs back to the specified path"
   echo "-d will destroy ("terminate") the AWS instance once testing and reporting completes"
   exit 1
