@@ -28,6 +28,7 @@
   tags:
    - prereqs
    - apache
+   - dataverse
 
 - include: sshkeys.yml
   when: sshkeys.enabled == True
@@ -45,19 +46,19 @@
 
 - include: dataverse-branch.yml
   when: dataverse_branch != "release"
+  tags: dataverse
 
 - include: jacoco-download.yml
   when: dataverse.jacoco.enabled == true and
         dataverse_repo != "release"
 
 - include: dataverse-download.yml
-  tags: glassfish
+  tags:
+    - glassfish
+    - release
 
 - include: dataverse-glassfish.yml
   tags: glassfish
-
-- include: dataverse-get-release.yml
-  tags: release
 
 - include: solr.yml
   tags: solr
@@ -72,10 +73,16 @@
 
 - include: localstack_create.yml
   when: localstack.enabled == true
-  tags: localstack 
+  tags: localstack
+
+- include: dataverse-build.yml
+  tags: dataverse
+  when: dataverse_branch != "release"
 
 - include: dataverse-install.yml
   tags: dataverse
+  when: (dataverse_zip_download is defined and dataverse_zip_download.changed) or
+        (dataverse_branch != "release" and dataverse_build_war_changed)
 
 - include: dataverse-storage.yml
   when: dataverse.filesdirs[0] is defined
@@ -83,6 +90,7 @@
 
 - include: dataverse-postinstall.yml
   tags: postinstall
+  when: need_dataverse_install
 
 - include: dataverse-gui.yml
   tags: gui
